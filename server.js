@@ -1,8 +1,12 @@
-const express = require("express")
+const express = require("express");
 
-const PORT = process.env.PORT || 3000
-const app = express()
+const DATABASE = require("./config/db");
+const PORT = process.env.PORT || 3000;
+const app = express();
 
-app.listen(PORT, () => {
-    console.log(`Server started at ${PORT}`)
-})
+DATABASE.sync().then(() => {
+  console.log("Database synced successfully!");
+  app.listen(PORT, () => {
+    console.log(`Server started at ${PORT}`);
+  });
+});
