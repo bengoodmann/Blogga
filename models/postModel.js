@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const crypto = require("crypto");
 const sequelize = require("../config/db");
+const path = require("path");
 
 const Post = sequelize.define("Post", {
   id: {
@@ -22,17 +23,10 @@ const Post = sequelize.define("Post", {
   },
   postImage: {
     type: DataTypes.STRING,
-    defaultValue: "",
   },
   readingTime: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-  },
-  audioFile: {
     type: DataTypes.STRING,
-    defaultValue: "",
   },
 });
 
-
-module.exports = Post
+module.exports = Post;
