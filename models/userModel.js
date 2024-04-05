@@ -5,8 +5,8 @@ const sequelize = require("../config/db");
 
 const User = sequelize.define("User", {
   id: {
-    type: DataTypes.UUIDV4,
-    defaultValue: () => crypto.randomUUID(),
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
     allowNull: false,
     primaryKey: true,
     unique: true,
@@ -52,11 +52,25 @@ const User = sequelize.define("User", {
   },
 });
 
+const About = sequelize.define("About", {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    allowNull: false,
+    primaryKey: true,
+    unique: true,
+  },
+  birthday: DataTypes.DATEONLY,
+  bio: DataTypes.TEXT,
+  twitter: DataTypes.STRING,
+  website: DataTypes.STRING,
+});
+
 User.addHook("beforeValidate", async (user, options) => {
   user.username = user.email.split("@")[0];
   const isUsername = await User.findOne({ where: { username: user.username } });
   if (isUsername) {
-    user.username += crypto.randomBytes(3).toString("hex");
+    user.username += "_" + crypto.randomBytes(3).toString("hex");
   }
 
   const hashPwd = await bcrypt.hash(user.password, 10);
@@ -67,4 +81,6 @@ User.addHook("afterValidate", async (user, options) => {
   user.username = `@${user.username}`;
 });
 
-module.exports = User;
+User.hasOne(About, { foreignKey: "userId", onDelete: "CASCADE"});
+About.belongsTo(User, { foreignKey: "userId"});
+module.exports = { User, About };
