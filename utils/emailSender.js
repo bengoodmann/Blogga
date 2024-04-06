@@ -35,14 +35,14 @@ const sendEmailVerification = (user) => {
   <hr>
   <h3>Hello, ${user.name}👋</h3>
   <p>We're happy to say welcome onboard</p>
-  <p>Please, click the following link to verify your email: <a href="http://localhost:3000/api/v1/user/verify/${user.verificationToken}">Verify Email</a></p>`;
+  <p>Please, click the following link to verify your email: <a href="http://localhost:3000/api/v1/user/verify/${user.emailVerificationToken}">Verify Email</a></p>`;
   sendEmail(user.email, "Email Verification", htmlTemplate);
 };
 
 const sendPasswordResetEmail = (user) => {
   const htmlTemplate = `
   <h3>Hello, ${user.name}👋</h3>
-  <p>Click the following link to reset your password: <a href="http://localhost:3000/api/v1/user/reset-password/${user.passwordResetToken}">Reset Password</a></p>
+  <p>Click the following link to reset your password: <a href="http://localhost:3000/api/v1/user/password-reset-done/${user.passwordChangeToken}">Reset Password</a></p>
   <p>If you didn't initiate this, kindly ignore it.</p>
   `;
   sendEmail(user.email, "Password Reset", htmlTemplate);
@@ -51,7 +51,7 @@ const sendPasswordResetEmail = (user) => {
 const sendPasswordChangeEmail = (user) => {
     const htmlTemplate = `
   <h3>Hello, ${user.name}👋</h3>
-  <p>You're password reset was successful</p>
+  <p>Your password reset was successful</p>
   `;
     sendEmail(user.email, "Password Reset Successful", htmlTemplate);  
 }
