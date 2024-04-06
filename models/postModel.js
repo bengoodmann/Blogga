@@ -1,12 +1,12 @@
 const { DataTypes } = require("sequelize");
-const crypto = require("crypto");
 const sequelize = require("../config/db");
-const path = require("path");
+const {User} = require("./userModel")
+
 
 const Post = sequelize.define("Post", {
   id: {
-    type: DataTypes.UUIDV4,
-    defaultValue: () => crypto.randomUUID(),
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
     allowNull: false,
     primaryKey: true,
     unique: true,
@@ -21,12 +21,20 @@ const Post = sequelize.define("Post", {
     type: DataTypes.TEXT,
     allowNull: false,
   },
-  postImage: {
+  featuredImage: {
     type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true, 
+    },
   },
   readingTime: {
     type: DataTypes.STRING,
   },
 });
+
+
+User.hasOne(Post, { foreignKey: "userId", onDelete: "CASCADE" });
+Post.belongsTo(User, { foreignKey: "userId" });
 
 module.exports = Post;
