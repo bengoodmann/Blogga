@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const User = require("../models/userModel");
+const { User } = require("../models/userModel");
 const crypto = require("crypto");
 const { validator, loginValidate } = require("../utils/validator");
 const {
@@ -22,17 +22,13 @@ const registerUser = async (req, res) => {
     if (user) {
       return res.status(400).json({ error: "A user with this email exists" });
     }
-    if (!req.file) {
-      return res.status(400).json({ error: "A featured image is required" });
-    }
 
     const newUser = await User.create({
       name,
       email,
       password,
-      profileImage: req.file ? `/profile_images/${req.file.filename}` : "",
     });
-    sendEmailVerification(user);
+    sendEmailVerification(newUser);
     return res
       .status(201)
       .json({ message: "User registered successfully", user: newUser });
@@ -76,6 +72,27 @@ const loginUser = async (req, res) => {
     return res.status(200).json({ token });
   } catch (error) {
     console.log("Error occurred while logging in", error);
+    return res.status(500).json({ error: "An internal error occurred" });
+  }
+};
+
+const emailVerification = async (req, res) => {
+  try {
+    const token = req.params.token;
+    const user = await User.findOne({
+      where: { emailVerificationToken: token },
+    });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    if (user.isVerified) {
+      return res.status(400).json({ error: "You're already verified" });
+    }
+    user.isVerified = true;
+    await user.save();
+    return res.status(200).json("Email verification was successful");
+  } catch (error) {
+    console.log("Error occurred while verifying email", error);
     return res.status(500).json({ error: "An internal error occurred" });
   }
 };
@@ -155,4 +172,6 @@ module.exports = {
   loginUser,
   changePassword,
   requestForPasswordReset,
+  resetPassword,
+  emailVerification,
 };

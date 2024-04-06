@@ -67,20 +67,26 @@ const About = sequelize.define("About", {
 });
 
 User.addHook("beforeValidate", async (user, options) => {
-  user.username = user.email.split("@")[0];
-  const isUsername = await User.findOne({ where: { username: user.username } });
-  if (isUsername) {
-    user.username += "_" + crypto.randomBytes(3).toString("hex");
+  if (user.email) {
+    user.username = user.email.split("@")[0];
+    const isUsername = await User.findOne({
+      where: { username: user.username },
+    });
+    if (isUsername) {
+      user.username += "_" + crypto.randomBytes(3).toString("hex");
+    }
   }
 
-  const hashPwd = await bcrypt.hash(user.password, 10);
-  user.password = hashPwd;
+  if (user.password) {
+    const hashPwd = await bcrypt.hash(user.password, 10);
+    user.password = hashPwd;
+  }
 });
 
 User.addHook("afterValidate", async (user, options) => {
   user.username = `@${user.username}`;
 });
 
-User.hasOne(About, { foreignKey: "userId", onDelete: "CASCADE"});
-About.belongsTo(User, { foreignKey: "userId"});
+User.hasOne(About, { foreignKey: "userId", onDelete: "CASCADE" });
+About.belongsTo(User, { foreignKey: "userId" });
 module.exports = { User, About };
